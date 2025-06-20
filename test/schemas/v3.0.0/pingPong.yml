@@ -9,11 +9,15 @@ channels:
     messages:
       ping:
         $ref: '#/components/messages/ping'
+      ping2:
+        $ref: '#/components/messages/ping2'
   pong:
     address: "dynamic"
     messages:
       pong:
         $ref: '#/components/messages/pong'
+      pong2:
+        $ref: '#/components/messages/pong2'
 operations:
   pingRequest:
     action: receive
@@ -29,6 +33,21 @@ operations:
         $ref: '#/channels/pong'
       messages:
         - $ref: '#/channels/pong/messages/pong'
+  # Test the case where action and channel are the same as in the previous operation
+  pingRequest2:
+    action: receive
+    channel:
+      $ref: '#/channels/ping'
+    messages:
+      - $ref: '#/channels/ping/messages/ping2'
+    reply:
+      address:
+        description: Reply is sent to topic specified in 'replyTo' property in the message header
+        location: "$message.header#/replyTo"
+      channel:
+        $ref: '#/channels/pong'
+      messages:
+        - $ref: '#/channels/pong/messages/pong2'
 components:
   messages:
     ping:
@@ -66,6 +85,43 @@ components:
           event:
             type: string
             const: pong
+      correlationId:
+        $ref: "#/components/correlationIds/pingCorrelationId"
+    ping2:
+      name: Ping2
+      headers:
+        type: object
+        properties:
+          replyTo:
+            type: string
+            description: Provide path to which reply must be provided
+          requestId:
+            type: string
+            format: uuid
+            description: Provide request id that you will use to identify the reply match
+      payload:
+        type: object
+        properties:
+          event:
+            type: string
+            const: ping2
+      correlationId:
+        $ref: "#/components/correlationIds/pingCorrelationId"
+    pong2:
+      name: Pong2
+      headers:
+        type: object
+        properties:
+          requestId:
+            type: string
+            format: uuid
+            description: Reply message must contain id of the request message
+      payload:
+        type: object
+        properties:
+          event:
+            type: string
+            const: pong2
       correlationId:
         $ref: "#/components/correlationIds/pingCorrelationId"
   correlationIds:

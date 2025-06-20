@@ -15,9 +15,14 @@ describe('deviceMessages', () => {
     expect(validate).toThrowError(new Error('message with key "Pong" on channel "ping" and operation "receive" not found'))
   })
 
-  it('should validate pong', () => {
-    const validate = validator.validate('Pong', {
+  it('should validate pong and pong2', () => {
+    let validate = validator.validate('Pong', {
       event: 'pong'
+    }, 'pong', 'receive')
+    expect(validate).toStrictEqual(true)
+
+    validate = validator.validate('Pong2', {
+      event: 'pong2'
     }, 'pong', 'receive')
     expect(validate).toStrictEqual(true)
   })

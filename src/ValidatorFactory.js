@@ -33,12 +33,22 @@ const constructsChannels = (schema, msgIdentifier = '') => {
       const action = operation.action
 
       const messages = getMessagesByMsgIdentifier(operation.messages, msgIdentifier)
-      channels[channel] = {...channels[channel], [action]: messages}
+      channels[channel] = {
+        ...channels[channel],
+        [action]: channels[channel] && channels[channel][action]
+          ? {...channels[channel][action], ...messages}
+          : messages
+      }
 
       if (operation.reply && operation.reply.channel) {
         const replyChannel = operation.reply.channel['x-parser-unique-object-id']
         const replyMessages = getMessagesByMsgIdentifier(operation.reply.messages, msgIdentifier)
-        channels[replyChannel] = {...channels[replyChannel], [action]: replyMessages}
+        channels[replyChannel] = {
+          ...channels[replyChannel],
+          [action]: channels[replyChannel] && channels[replyChannel][action]
+            ? {...channels[replyChannel][action], ...replyMessages}
+            : replyMessages
+        }
       }
     })
   }
